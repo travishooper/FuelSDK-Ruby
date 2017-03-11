@@ -41,9 +41,9 @@ describe MarketingCloudSDK::Soap do
       client.internal_token = 'innerspace'
       expect(client.header).to eq(
         {
-          'oAuth' => { 'oAuthToken' => 'innerspace' },
-          :attributes! => {
-            'oAuth' => { 'xmlns' => 'http://exacttarget.com' }
+          'oAuth' => {
+            :@xmlns => 'http://exacttarget.com',
+            'oAuthToken' => 'innerspace'
           }
         }
       )
@@ -59,20 +59,24 @@ describe MarketingCloudSDK::Soap do
     end
 
     it '#soap_describe calls client with :describe and DescribeRequests message' do
-      expect(subject.soap_describe 'Subscriber').to eq([:describe,
-        {'DescribeRequests' => {'ObjectDefinitionRequest' => {'ObjectType' => 'Subscriber' }}}])
+      expect(subject.soap_describe 'Subscriber').to eq(
+        [:describe, {'DescribeRequests' => {'ObjectDefinitionRequest' => {'ObjectType' => 'Subscriber' }}}]
+      )
     end
 
     describe '#soap_post' do
       let(:properties) do
         [
           {
-            'EmailAddress' => 'first@fuelsdk.com', 'Attributes'=> [
-              {'Name'=>'First Name', 'Value'=>'first'},
-              {'Name'=>'Last Name', 'Value'=>'subscriber'}
-            ]
-          },
-          { 'EmailAddress' => 'second@fuelsdk.com' }
+            'Objects' => [{
+              'EmailAddress' => 'test@fuelsdk.com',
+              'Attributes' => [
+                {'Name' => 'First Name', 'Value' => 'first'},
+                {'Name' => 'Last Name', 'Value' => 'subscriber'},
+              ],
+              :'@xsi:type' => 'tns:Subscriber'
+            }]
+          }
         ]
       end
 
@@ -80,8 +84,21 @@ describe MarketingCloudSDK::Soap do
         expect(subject.soap_post('Subscriber', properties)).to eq([
           :create,
           {
-            'Objects' => properties,
-            :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
+            "Objects" => [
+              {
+                "Objects" => [
+                  {
+                    "EmailAddress" => "test@fuelsdk.com",
+                    "Attributes" => [
+                      {"Name" => "First Name", "Value" => "first"},
+                      {"Name" => "Last Name", "Value" => "subscriber"}
+                    ],
+                    :"@xsi:type" => "tns:Subscriber"
+                  }
+                ],
+                :"@xsi:type" => "tns:Subscriber"
+              }
+            ]
           }
         ])
       end

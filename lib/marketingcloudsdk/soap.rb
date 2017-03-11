@@ -121,8 +121,10 @@ module MarketingCloudSDK
     def header
       raise 'Require legacy token for soap header' unless internal_token
       {
-        'oAuth' => {'oAuthToken' => internal_token},
-        :attributes! => { 'oAuth' => { 'xmlns' => 'http://exacttarget.com' }}
+        'oAuth' => {
+          :'@xmlns' => 'http://exacttarget.com',
+          'oAuthToken' => internal_token
+        }
       }
     end
 
@@ -163,7 +165,7 @@ module MarketingCloudSDK
       message = {}
       message['Action'] = action
       message['Definitions'] = {'Definition' => properties}
-      message['Definitions'][:attributes!] = { 'Definition' => { 'xsi:type' => ('tns:' + object_type) }}
+      message['Definitions'][:'@xsi:type'] = 'tns:' + object_type
 
       soap_request :perform, message
     end
@@ -181,7 +183,7 @@ module MarketingCloudSDK
       else
         message['Configurations'] = {'Configuration' => properties}
       end
-      message['Configurations'][:attributes!] = { 'Configuration' => { 'xsi:type' => ('tns:' + object_type) }}
+      message['Configurations'][:'@xsi:type'] = 'tns:' + object_type
 
       soap_request :configure, message
     end
@@ -205,13 +207,12 @@ module MarketingCloudSDK
 
       if filter and filter.kind_of? Hash
         message['Filter'] = filter
-        message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:SimpleFilterPart' } }
+        message['Filter'][:'@xsi:type'] = 'tns:SimpleFilterPart'
 
         if filter.has_key?('LogicalOperator')
-          message[:attributes!] = { 'Filter' => { 'xsi:type' => 'tns:ComplexFilterPart' }}
-          message['Filter'][:attributes!] = {
-            'LeftOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' },
-            'RightOperand' => { 'xsi:type' => 'tns:SimpleFilterPart' }}
+          message['Filter'][:'@xsi:type'] = 'tns:ComplexFilterPart'
+          message['Filter']['LeftOperand']['@xsi:type'] = 'tns:SimpleFilterPart'
+          message['Filter']['RightOperand']['@xsi:type'] = 'tns:SimpleFilterPart'
         end
       end
       message = {'RetrieveRequest' => message}
@@ -238,10 +239,32 @@ module MarketingCloudSDK
     private
 
     def soap_cud action, object_type, properties, upsert=nil
-      message = {
-        'Objects' => properties,
-        :attributes! => { 'Objects' => { 'xsi:type' => ('tns:' + object_type) } }
-      }
+      # get a list of attributes so we can seperate
+      # them from standard object properties
+      #type_attrs = soap_describe(object_type).editable
+
+      #
+      #   properties = [properties] unless properties.kind_of? Array
+      #   properties.each do |p|
+      #     formated_attrs = []
+      #     p.each do |k, v|
+      #       if type_attrs.include? k
+      #         p.delete k
+      #         attrs = MarketingCloudSDK.format_name_value_pairs k => v
+      #         formated_attrs.concat attrs
+      #       end
+      #     end
+      #     (p['Attributes'] ||= []).concat formated_attrs unless formated_attrs.empty?
+      #   end
+      #
+
+      message = {'Objects' => properties}
+
+      if properties.is_a? Array
+        properties.each { |p| p[:'@xsi:type'] = ('tns:' + object_type) }
+      else
+        message['Objects'][:'@xsi:type'] = 'tns:' + object_type
+      end
 
       if upsert
         message['Options'] = {"SaveOptions" => {"SaveOption" => {"PropertyName"=> "*", "SaveAction" => "UpdateAdd"}}}
