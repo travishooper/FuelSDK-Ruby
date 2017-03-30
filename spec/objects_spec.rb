@@ -1,4 +1,5 @@
 require 'spec_helper.rb'
+require 'rspec/its'
 require 'objects_helper_spec.rb'
 
 describe MarketingCloudSDK::Objects::Base do
@@ -375,7 +376,7 @@ describe MarketingCloudSDK::DataExtension::Row do
     end
 
     it 'updates missing' do
-      rsp = mock(MarketingCloudSDK::SoapResponse)
+      rsp = double(MarketingCloudSDK::SoapResponse)
       rsp.stub(:results).and_return([{:name => 'Products', :customer_key => 'ProductsKey'}])
       rsp.stub(:success?).and_return true
 
@@ -444,7 +445,7 @@ describe MarketingCloudSDK::DataExtension::Row do
     it 'uses name to get customer key for inseration' do
       subject.name = 'Subscribers'
 
-      rsp = mock(MarketingCloudSDK::SoapResponse)
+      rsp = double(MarketingCloudSDK::SoapResponse)
       rsp.stub(:results).and_return([{:name => 'Products', :customer_key => 'ProductsKey'}])
       rsp.stub(:success?).and_return true
 
