@@ -8,13 +8,13 @@ describe MarketingCloudSDK::Objects::Base do
   subject{ object }
 
   describe '#properties' do
-    it 'is empty by default' do
-      expect(object.properties).to be_empty
+    it 'is nil by default' do
+      expect(object.properties).to be_nil
     end
 
-    it 'returns item in array when item is not an array' do
+    it 'returns item' do
       object.properties = {'name' => 'value'}
-      expect(object.properties).to eq([{'name' => 'value'}])
+      expect(object.properties).to eq({'name' => 'value'})
     end
 
     it 'returns array when assigned array' do
@@ -183,12 +183,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.post).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
 
@@ -197,12 +197,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.post).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
 
@@ -231,12 +231,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.post).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
 
@@ -245,12 +245,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.post).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
 
@@ -260,12 +260,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.post).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
 
@@ -321,12 +321,12 @@ describe MarketingCloudSDK::DataExtension do
       expect(subject.patch).to eq(
         [
           'DataExtension',
-          [{
+          {
             'Name' => 'Some DE',
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
-          }]
+          }
         ])
     end
   end
@@ -402,7 +402,7 @@ describe MarketingCloudSDK::DataExtension::Row do
 
     it 'passes id including name to super get' do
       subject.name = 'Justin'
-      expect(subject.get).to eq(['DataExtensionObject[Justin]', [], nil])
+      expect(subject.get).to eq(['DataExtensionObject[Justin]', nil, nil])
     end
   end
 
