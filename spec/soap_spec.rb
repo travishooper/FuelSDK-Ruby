@@ -51,12 +51,12 @@ describe MarketingCloudSDK::Soap do
   end
 
   describe 'requests' do
-    subject {
+    subject do
       client.stub(:soap_request) do |action, message|
         [action, message]
       end
       client
-    }
+    end
 
     it '#soap_describe calls client with :describe and DescribeRequests message' do
       expect(subject.soap_describe 'Subscriber').to eq([:describe,
@@ -64,76 +64,26 @@ describe MarketingCloudSDK::Soap do
     end
 
     describe '#soap_post' do
-      subject {
-        client.stub(:soap_request) do |action, message|
-          [action, message]
-        end
-
-        client.stub_chain(:soap_describe,:editable)
-          .and_return(['First Name', 'Last Name', 'Gender'])
-        client
-      }
-      it 'formats soap :create message for single object' do
-        expect(subject.soap_post 'Subscriber', 'EmailAddress' => 'test@fuelsdk.com' ).to eq([:create,
+      let(:properties) do
+        [
           {
-            'Objects' => [{'EmailAddress' => 'test@fuelsdk.com'}],
-            :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
-          }])
+            'EmailAddress' => 'first@fuelsdk.com', 'Attributes'=> [
+              {'Name'=>'First Name', 'Value'=>'first'},
+              {'Name'=>'Last Name', 'Value'=>'subscriber'}
+            ]
+          },
+          { 'EmailAddress' => 'second@fuelsdk.com' }
+        ]
       end
 
-      it 'formats soap :create message for multiple objects' do
-        expect(subject.soap_post 'Subscriber', [{'EmailAddress' => 'first@fuelsdk.com'}, {'EmailAddress' => 'second@fuelsdk.com'}] ).to eq([:create,
+      it 'formats a soap :create message using the provided properties' do
+        expect(subject.soap_post('Subscriber', properties)).to eq([
+          :create,
           {
-            'Objects' => [{'EmailAddress' => 'first@fuelsdk.com'}, {'EmailAddress' => 'second@fuelsdk.com'}],
+            'Objects' => properties,
             :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
-          }])
-      end
-
-      it 'formats soap :create message for single object with an attribute' do
-        expect(subject.soap_post 'Subscriber', {'EmailAddress' => 'test@fuelsdk.com', 'Attributes'=> [{'Name'=>'First Name', 'Value'=>'first'}]}).to eq([:create,
-          {
-            'Objects' => [{
-              'EmailAddress' => 'test@fuelsdk.com',
-              'Attributes' => [{'Name' => 'First Name', 'Value' => 'first'}],
-            }],
-            :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
-          }])
-      end
-
-      it 'formats soap :create message for single object with multiple attributes' do
-        expect(subject.soap_post 'Subscriber', {'EmailAddress' => 'test@fuelsdk.com',
-          'Attributes'=> [{'Name'=>'First Name', 'Value'=>'first'}, {'Name'=>'Last Name', 'Value'=>'subscriber'}]}).to eq([:create,
-          {
-            'Objects' => [{
-              'EmailAddress' => 'test@fuelsdk.com',
-              'Attributes' => [
-                {'Name' => 'First Name', 'Value' => 'first'},
-                {'Name' => 'Last Name', 'Value' => 'subscriber'},
-              ],
-            }],
-            :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
-          }])
-      end
-
-      it 'formats soap :create message for multiple objects with multiple attributes' do
-        expect(subject.soap_post 'Subscriber', [{'EmailAddress' => 'first@fuelsdk.com', 'Attributes'=> [{'Name'=>'First Name', 'Value'=>'first'}, {'Name'=>'Last Name', 'Value'=>'subscriber'}]},
-          {'EmailAddress' => 'second@fuelsdk.com', 'Attributes'=> [{'Name'=>'First Name', 'Value'=>'second'}, {'Name'=>'Last Name', 'Value'=>'subscriber'}]}]).to eq([:create,
-          {
-            'Objects' => [
-              {'EmailAddress' => 'first@fuelsdk.com',
-                'Attributes' => [
-                  {'Name' => 'First Name', 'Value' => 'first'},
-                  {'Name' => 'Last Name', 'Value' => 'subscriber'},
-                ]
-              },
-              {'EmailAddress' => 'second@fuelsdk.com',
-                'Attributes' => [
-                  {'Name' => 'First Name', 'Value' => 'second'},
-                  {'Name' => 'Last Name', 'Value' => 'subscriber'},
-                ]
-              }],
-            :attributes! => {'Objects' => {'xsi:type' => ('tns:Subscriber')}}
-          }])
+          }
+        ])
       end
     end
   end
