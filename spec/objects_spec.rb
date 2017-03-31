@@ -269,41 +269,6 @@ describe MarketingCloudSDK::DataExtension do
         ])
     end
 
-    describe 'fields are defined twice' do
-      it 'when defined in properties and by fields' do
-        subject.fields = [{'Name' => 'A field'}]
-        subject.properties = {'Name' => 'Some DE', 'Fields' => {'Field' => [{'Name' => 'A field'}]}}
-        expect{subject.post}.to raise_error 'Fields are defined in too many ways. Please only define once.'
-      end
-      it 'when defined in properties explicitly and with columns key' do
-        subject.properties = {'Name' => 'Some DE',
-          'columns' => [{'Name' => 'A fields'}],
-          'Fields' => {'Field' => [{'Name' => 'A field'}]
-        }}
-        expect{subject.post}.to raise_error 'Fields are defined in too many ways. Please only define once.'
-      end
-      it 'when defined in properties explicitly and with fields key' do
-        subject.properties = {'Name' => 'Some DE',
-          'fields' => [{'Name' => 'A fields'}],
-          'Fields' => {'Field' => [{'Name' => 'A field'}]
-        }}
-        expect{subject.post}.to raise_error 'Fields are defined in too many ways. Please only define once.'
-      end
-      it 'when defined in with fields and colums key' do
-        subject.properties = {'Name' => 'Some DE',
-          'fields' => [{'Name' => 'A fields'}],
-          'columns' => [{'Name' => 'A field'}]
-        }
-        expect{subject.post}.to raise_error 'Fields are defined in too many ways. Please only define once.'
-      end
-      it 'when defined in with fields key and accessor' do
-        subject.fields = [{'Name' => 'A field'}]
-        subject.properties = {'Name' => 'Some DE',
-          'fields' => [{'Name' => 'A fields'}]
-        }
-        expect{subject.post}.to raise_error 'Fields are defined in too many ways. Please only define once.'
-      end
-    end
   end
 
   describe '#patch' do
