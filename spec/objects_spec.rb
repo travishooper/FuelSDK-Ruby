@@ -170,6 +170,7 @@ describe MarketingCloudSDK::DataExtension do
           'DataExtension',
           [{
             'Name' => 'Some DE',
+            "fields" => [{"Name" => 'A field'}],
             'Fields' => {
               'Field' => [{'Name' => 'A field'}]
             }
