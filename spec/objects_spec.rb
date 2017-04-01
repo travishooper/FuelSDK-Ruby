@@ -193,20 +193,6 @@ describe MarketingCloudSDK::DataExtension do
         ])
     end
 
-    it 'DataExtension fields can be apart of the DataExtention properties' do
-      subject.properties = {'Name' => 'Some DE', 'Fields' => {'Field' => [{'Name' => 'A field'}]}}
-      expect(subject.post).to eq(
-        [
-          'DataExtension',
-          {
-            'Name' => 'Some DE',
-            'Fields' => {
-              'Field' => [{'Name' => 'A field'}]
-            }
-          }
-        ])
-    end
-
     it 'List of DataExtension definitions can be passed' do
       subject.properties = [{'Name' => 'Some DE', 'Fields' => {'Field' => [{'Name' => 'A field'}]}},
         {'Name' => 'Another DE', 'Fields' => {'Field' => [{'Name' => 'A second field'}]}}]
